@@ -40,7 +40,6 @@
     .footer{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:14px 16px;color:var(--muted);border-top:1px dashed rgba(0,0,0,.12)}
     [data-theme="dark"] .footer{border-top:1px dashed rgba(255,255,255,.12)}
     .kpi{display:flex;gap:14px;flex-wrap:wrap}
-    /* 新增高亮样式 */
     .highlight-card{
       padding:8px 14px;
       border-radius:12px;
@@ -61,7 +60,7 @@
 </head>
 <body data-theme="light">
   <div class="wrap">
-    <h1>东方树叶价格计算器</h1>
+    <h1>东方树叶价格计算器（建议每升5.5元可冲）</h1>
     <div class="sub">输入总价与瓶数，自动计算 <strong>每毫升</strong>、<strong>每100ml</strong>、<strong>每升(1000ml)</strong> 的单价，并标记最划算容量。还会统计一次购物的总体均价。</div>
 
     <div class="controls">
@@ -108,7 +107,7 @@
 
 <script>
 (function(){
-  const sizes = [335, 500, 900, 1500]
+  const sizes = [335, 500, 900, 1500]  // 原始容量
   const rowsEl = document.getElementById('rows')
   const currencyEl = document.getElementById('currency')
   const bestBadge = document.getElementById('bestBadge')
@@ -117,12 +116,16 @@
 
   const state = new Map()
 
-  function createRow(size){
+  function createRow(size, isCustom=false){
     const row = document.createElement('div')
     row.className = 'row'
 
     const c0 = document.createElement('div')
-    c0.innerHTML = `<span class="size">${size} ml</span>`
+    if(isCustom){
+      c0.innerHTML = `<input type="number" min="0" step="1" placeholder="自定义容量ml" style="width:100%">`
+    } else {
+      c0.innerHTML = `<span class="size">${size} ml</span>`
+    }
 
     const priceWrap = document.createElement('div')
     priceWrap.className = 'field'
@@ -147,13 +150,15 @@
     row.append(c0, priceWrap, countWrap, perMl, per100, perL)
     rowsEl.appendChild(row)
 
-    state.set(size, {price, count, perMl, per100, perL})
+    state.set(size, {sizeInput:isCustom? c0.querySelector('input'):null, price, count, perMl, per100, perL})
 
     price.addEventListener('input', compute)
     count.addEventListener('input', compute)
+    if(isCustom) c0.querySelector('input').addEventListener('input', compute)
   }
 
-  sizes.forEach(createRow)
+  sizes.forEach(size => createRow(size))
+  createRow('custom', true) // 自定义行
 
   function formatMoney(v){
     if (!isFinite(v)) return '—'
@@ -168,21 +173,22 @@
     let totalPrice = 0
     let totalMl = 0
 
-    for(const size of sizes){
-      const {price, count, perMl, per100, perL} = state.get(size)
+    for(const key of state.keys()){
+      const {sizeInput, price, count, perMl, per100, perL} = state.get(key)
+      const s = sizeInput ? parseFloat(sizeInput.value) : (key==='custom'?NaN:key)
       const p = parseFloat(price.value)
       const n = parseFloat(count.value)
-      const unit = (isFinite(p) && isFinite(n) && n>0 && size>0) ? (p / (n * size)) : NaN
+      const unit = (isFinite(p) && isFinite(n) && n>0 && isFinite(s) && s>0) ? (p / (n * s)) : NaN
 
       perMl.textContent   = formatMoney(unit) + ' / ml'
       per100.textContent  = isFinite(unit) ? formatMoney(unit * 100) + ' / 100ml' : '—'
       perL.textContent    = isFinite(unit) ? formatMoney(unit * 1000) + ' / 升' : '—'
 
       if (isFinite(unit)){
-        if (unit < best.value){ best = {size, value:unit} }
-        if (unit > worst.value){ worst = {size, value:unit} }
+        if (unit < best.value){ best = {size:s, value:unit} }
+        if (unit > worst.value){ worst = {size:s, value:unit} }
         totalPrice += p
-        totalMl += n * size
+        totalMl += n * s
       }
     }
 
@@ -199,7 +205,10 @@
   }
 
   document.getElementById('reset').addEventListener('click', ()=>{
-    for(const {price, count} of state.values()){ price.value=''; count.value='' }
+    for(const {sizeInput, price, count} of state.values()){ 
+      if(sizeInput) sizeInput.value = ''
+      price.value=''; count.value='' 
+    }
     compute()
   })
 
@@ -210,25 +219,24 @@
       900: {price: 30.0, count: 3},
       1500:{price: 70.0, count: 2}
     }
-    for(const size of sizes){
-      const {price, count} = state.get(size)
-      price.value = demo[size]?.price ?? ''
-      count.value = demo[size]?.count ?? ''
+    for(const key of state.keys()){
+      const {sizeInput, price, count} = state.get(key)
+      if(key !== 'custom'){
+        price.value = demo[key]?.price ?? ''
+        count.value = demo[key]?.count ?? ''
+      } else {
+        price.value=''; count.value=''; if(sizeInput) sizeInput.value=''
+      }
     }
     compute()
   })
 
   currencyEl.addEventListener('change', compute)
 
-  // 主题切换
   const toggleBtn = document.getElementById('toggleTheme')
   toggleBtn.addEventListener('click', ()=>{
     const body = document.body
-    if(body.getAttribute('data-theme') === 'light'){
-      body.setAttribute('data-theme','dark')
-    } else {
-      body.setAttribute('data-theme','light')
-    }
+    body.setAttribute('data-theme', body.getAttribute('data-theme')==='light'?'dark':'light')
   })
 
   compute()
