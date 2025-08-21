@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>东方树叶价格计算器</title>
+  <style>
+    :root{
+      --bg:#fdfdfd;--card:#ffffff;--muted:#555;--text:#111;--accent:#007bff;--ok:#26c281;--warn:#ff6b6b;
+    }
+    [data-theme="dark"]{
+      --bg:#0b1020;--card:#121a33;--muted:#93a0b2;--text:#eaf1ff;--accent:#4da3ff;--ok:#26c281;--warn:#ff5c5c;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial;transition:.3s background,.3s color}
+    .wrap{max-width:980px;margin:32px auto;padding:0 16px}
+    h1{font-size:clamp(22px,3.5vw,34px);letter-spacing:.5px;margin:0 0 10px}
+    .sub{color:var(--muted);margin-bottom:20px}
+    .card{background:var(--card);border:1px solid rgba(0,0,0,.06);border-radius:18px;box-shadow:0 10px 30px rgba(0,0,0,.1);overflow:hidden;transition:.3s background}
+    [data-theme="dark"] .card{border:1px solid rgba(255,255,255,.06);box-shadow:0 10px 30px rgba(0,0,0,.35)}
+    .row{display:grid;grid-template-columns:140px repeat(2, minmax(90px,1fr)) repeat(3, minmax(110px,1fr));gap:10px;align-items:center}
+    .head{padding:14px 16px;background:rgba(0,0,0,.03);position:sticky;top:0;backdrop-filter:blur(8px)}
+    [data-theme="dark"] .head{background:rgba(255,255,255,.03)}
+    .body{padding:12px 16px;display:grid;gap:8px}
+    .row>div,.row>label{padding:10px 8px}
+    .row.head>div{font-weight:600;color:var(--accent)}
+    .size{font-weight:600}
+    .field{display:flex;gap:8px;align-items:center}
+    input[type="number"]{width:100%;padding:10px 12px;border-radius:12px;border:1px solid rgba(0,0,0,.12);background:#fff;color:var(--text)}
+    input[type="number"]:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(77,163,255,.2)}
+    [data-theme="dark"] input[type="number"]{background:#0e152b;border:1px solid rgba(255,255,255,.12);color:var(--text)}
+    .unit{opacity:.7;font-size:12px}
+    .muted{color:var(--muted)}
+    .pill{display:inline-flex;gap:6px;align-items:center;padding:6px 10px;border-radius:999px;background:rgba(0,0,0,.06);border:1px solid rgba(0,0,0,.08);font-size:12px}
+    [data-theme="dark"] .pill{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08)}
+    .controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin:16px 0}
+    button{cursor:pointer;border:1px solid rgba(0,0,0,.12);background:#fff;color:var(--text);padding:10px 14px;border-radius:12px}
+    button:hover{border-color:var(--accent)}
+    [data-theme="dark"] button{background:#0e152b;border:1px solid rgba(255,255,255,.12);color:var(--text)}
+    .footer{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:14px 16px;color:var(--muted);border-top:1px dashed rgba(0,0,0,.12)}
+    [data-theme="dark"] .footer{border-top:1px dashed rgba(255,255,255,.12)}
+    .kpi{display:flex;gap:14px;flex-wrap:wrap}
+    .highlight-card{
+      padding:8px 14px;
+      border-radius:12px;
+      font-weight:700;
+      font-size:15px;
+      box-shadow:0 3px 8px rgba(0,0,0,.15);
+    }
+    .highlight-best{background:var(--ok);color:#fff;}
+    .highlight-worst{background:var(--warn);color:#fff;}
+    .summary{margin-top:24px;padding:16px;border-radius:16px;background:rgba(0,0,0,.05);border:1px dashed rgba(0,0,0,.15)}
+    [data-theme="dark"] .summary{background:rgba(255,255,255,.05);border:1px dashed rgba(255,255,255,.15)}
+    a{color:var(--accent);text-decoration:none}
+    @media (max-width: 800px){
+      .row{grid-template-columns:100px 1fr 1fr 1fr 1fr 1fr}
+      .hide-sm{display:none}
+    }
+  </style>
+</head>
+<body data-theme="light">
+  <div class="wrap">
+    <h1>东方树叶价格计算器（建议每升5.5元可冲）</h1>
+    <div class="sub">输入总价与瓶数，自动计算 <strong>每毫升</strong>、<strong>每100ml</strong>、<strong>每升(1000ml)</strong> 的单价，并标记最划算容量。还会统计一次购物的总体均价。</div>
+
+    <div class="controls">
+      <div class="pill">货币符号：
+        <select id="currency" style="margin-left:8px;border-radius:10px;padding:6px 10px">
+          <option value="¥">¥ 人民币</option>
+          <option value="$">$ 美元</option>
+          <option value="€">€ 欧元</option>
+        </select>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button id="reset">清空</button>
+        <button id="demo">示例数据</button>
+        <button id="toggleTheme">切换主题</button>
+      </div>
+    </div>
+
+    <div class="card" role="table" aria-label="价格计算表">
+      <div class="row head" role="row">
+        <div class="size" role="columnheader">容量</div>
+        <div role="columnheader">总价</div>
+        <div role="columnheader">瓶数</div>
+        <div role="columnheader">每毫升</div>
+        <div class="hide-sm" role="columnheader">每100ml</div>
+        <div class="hide-sm" role="columnheader">每升</div>
+      </div>
+      <div class="body" id="rows"></div>
+      <div class="footer">
+        <div class="muted">公式：每毫升单价 = 总价 ÷ (瓶数 × 容量ml)</div>
+        <div class="kpi">
+          <span id="bestBadge" class="highlight-card highlight-best">最划算：—</span>
+          <span id="worstBadge" class="highlight-card highlight-worst">最贵：—</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="summary" id="summaryBox">
+      <h3>购物总计</h3>
+      <div id="summaryResult">请填写数据以查看总计结果。</div>
+    </div>
+
+    <p class="muted" style="margin-top:12px">提示：仅比较单位 <em>毫升</em> 的价格，未考虑促销、运费等因素。</p>
+  </div>
+
+<script>
+(function(){
+  const sizes = [335, 500, 900, 1500]  // 原始容量
+  const rowsEl = document.getElementById('rows')
+  const currencyEl = document.getElementById('currency')
+  const bestBadge = document.getElementById('bestBadge')
+  const worstBadge = document.getElementById('worstBadge')
+  const summaryResult = document.getElementById('summaryResult')
+
+  const state = new Map()
+
+  function createRow(size, isCustom=false){
+    const row = document.createElement('div')
+    row.className = 'row'
+
+    const c0 = document.createElement('div')
+    if(isCustom){
+      c0.innerHTML = `<input type="number" min="0" step="1" placeholder="自定义容量ml" style="width:100%">`
+    } else {
+      c0.innerHTML = `<span class="size">${size} ml</span>`
+    }
+
+    const priceWrap = document.createElement('div')
+    priceWrap.className = 'field'
+    const price = document.createElement('input')
+    price.type = 'number'; price.min = '0'; price.step = '0.01'; price.placeholder = '如 12.90'
+    price.setAttribute('inputmode','decimal')
+    priceWrap.appendChild(price)
+
+    const countWrap = document.createElement('div')
+    countWrap.className = 'field'
+    const count = document.createElement('input')
+    count.type = 'number'; count.min = '0'; count.step = '1'; count.placeholder = '如 6'
+    count.setAttribute('inputmode','numeric')
+    countWrap.appendChild(count)
+
+    const perMl = document.createElement('div')
+    const per100 = document.createElement('div')
+    per100.className = 'hide-sm'
+    const perL = document.createElement('div')
+    perL.className = 'hide-sm'
+
+    row.append(c0, priceWrap, countWrap, perMl, per100, perL)
+    rowsEl.appendChild(row)
+
+    state.set(size, {sizeInput:isCustom? c0.querySelector('input'):null, price, count, perMl, per100, perL})
+
+    price.addEventListener('input', compute)
+    count.addEventListener('input', compute)
+    if(isCustom) c0.querySelector('input').addEventListener('input', compute)
+  }
+
+  sizes.forEach(size => createRow(size))
+  createRow('custom', true) // 自定义行
+
+  function formatMoney(v){
+    if (!isFinite(v)) return '—'
+    const cur = currencyEl.value
+    return `${cur}${v.toFixed(4)}`
+  }
+
+  function compute(){
+    let best = {size:null, value:Infinity}
+    let worst = {size:null, value:-Infinity}
+
+    let totalPrice = 0
+    let totalMl = 0
+
+    for(const key of state.keys()){
+      const {sizeInput, price, count, perMl, per100, perL} = state.get(key)
+      const s = sizeInput ? parseFloat(sizeInput.value) : (key==='custom'?NaN:key)
+      const p = parseFloat(price.value)
+      const n = parseFloat(count.value)
+      const unit = (isFinite(p) && isFinite(n) && n>0 && isFinite(s) && s>0) ? (p / (n * s)) : NaN
+
+      perMl.textContent   = formatMoney(unit) + ' / ml'
+      per100.textContent  = isFinite(unit) ? formatMoney(unit * 100) + ' / 100ml' : '—'
+      perL.textContent    = isFinite(unit) ? formatMoney(unit * 1000) + ' / 升' : '—'
+
+      if (isFinite(unit)){
+        if (unit < best.value){ best = {size:s, value:unit} }
+        if (unit > worst.value){ worst = {size:s, value:unit} }
+        totalPrice += p
+        totalMl += n * s
+      }
+    }
+
+    bestBadge.textContent = best.size ? `最划算：${best.size}ml (${formatMoney(best.value)}/ml)` : '最划算：—'
+    worstBadge.textContent = worst.size ? `最贵：${worst.size}ml (${formatMoney(worst.value)}/ml)` : '最贵：—'
+
+    if(totalPrice > 0 && totalMl > 0){
+      const unit = totalPrice / totalMl
+      summaryResult.innerHTML = `本次总计 ${formatMoney(totalPrice)}，总容量 ${totalMl}ml<br>`+
+        `平均单价：${formatMoney(unit)} / ml ， ${formatMoney(unit*100)} / 100ml ， ${formatMoney(unit*1000)} / 升`
+    } else {
+      summaryResult.textContent = '请填写数据以查看总计结果。'
+    }
+  }
+
+  document.getElementById('reset').addEventListener('click', ()=>{
+    for(const {sizeInput, price, count} of state.values()){ 
+      if(sizeInput) sizeInput.value = ''
+      price.value=''; count.value='' 
+    }
+    compute()
+  })
+
+  document.getElementById('demo').addEventListener('click', ()=>{
+    const demo = {
+      335: {price: 58.8, count: 6},
+      500: {price: 50.0, count: 5},
+      900: {price: 30.0, count: 3},
+      1500:{price: 70.0, count: 2}
+    }
+    for(const key of state.keys()){
+      const {sizeInput, price, count} = state.get(key)
+      if(key !== 'custom'){
+        price.value = demo[key]?.price ?? ''
+        count.value = demo[key]?.count ?? ''
+      } else {
+        price.value=''; count.value=''; if(sizeInput) sizeInput.value=''
+      }
+    }
+    compute()
+  })
+
+  currencyEl.addEventListener('change', compute)
+
+  const toggleBtn = document.getElementById('toggleTheme')
+  toggleBtn.addEventListener('click', ()=>{
+    const body = document.body
+    body.setAttribute('data-theme', body.getAttribute('data-theme')==='light'?'dark':'light')
+  })
+
+  compute()
+})()
+</script>
+</body>
+</html>
