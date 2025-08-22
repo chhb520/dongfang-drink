@@ -1,5 +1,5 @@
 # 东方树叶&三得利  比价器
-[东方树叶比价器https://df.chhb.dpdns.org/](https://df.chhb.dpdns.org/)
+[东方树叶比价器](https://df.chhb.dpdns.org/)
 ```
 https://df.chhb.dpdns.org
 ```
