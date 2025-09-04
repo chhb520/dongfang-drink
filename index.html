@@ -2,249 +2,806 @@
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
   <title>东方树叶三得利价格计算器</title>
   <style>
     :root{
       --bg:#fdfdfd;--card:#ffffff;--muted:#555;--text:#111;--accent:#007bff;--ok:#26c281;--warn:#ff6b6b;
+      --border-light:rgba(0,0,0,.06);--border-dark:rgba(255,255,255,.06);
+      --shadow-light:rgba(0,0,0,.1);--shadow-dark:rgba(0,0,0,.35);
     }
     [data-theme="dark"]{
       --bg:#0b1020;--card:#121a33;--muted:#93a0b2;--text:#eaf1ff;--accent:#4da3ff;--ok:#26c281;--warn:#ff5c5c;
     }
     *{box-sizing:border-box}
-    body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial;transition:.3s background,.3s color}
+    body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial;transition:.3s background,.3s color;-webkit-text-size-adjust:100%;touch-action:manipulation}
     .wrap{max-width:980px;margin:32px auto;padding:0 16px}
-    h1{font-size:clamp(22px,3.5vw,34px);letter-spacing:.5px;margin:0 0 10px}
-    .sub{color:var(--muted);margin-bottom:20px}
-    .card{background:var(--card);border:1px solid rgba(0,0,0,.06);border-radius:18px;box-shadow:0 10px 30px rgba(0,0,0,.1);overflow:hidden;transition:.3s background}
-    [data-theme="dark"] .card{border:1px solid rgba(255,255,255,.06);box-shadow:0 10px 30px rgba(0,0,0,.35)}
-    .row{display:grid;grid-template-columns:140px repeat(2, minmax(90px,1fr)) repeat(3, minmax(110px,1fr));gap:10px;align-items:center}
-    .head{padding:14px 16px;background:rgba(0,0,0,.03);position:sticky;top:0;backdrop-filter:blur(8px)}
+    h1{font-size:clamp(18px,5vw,34px);letter-spacing:.5px;margin:0 0 10px;line-height:1.2}
+    .sub{color:var(--muted);margin-bottom:20px;font-size:14px;line-height:1.5}
+    .card{background:var(--card);border:1px solid var(--border-light);border-radius:18px;box-shadow:0 10px 30px var(--shadow-light);overflow:hidden;transition:.3s all}
+    [data-theme="dark"] .card{border:1px solid var(--border-dark);box-shadow:0 10px 30px var(--shadow-dark)}
+    .row{display:grid;grid-template-columns:120px repeat(2, 1fr) repeat(3, 1fr);gap:8px;align-items:center;min-height:60px}
+    .head{padding:12px 16px;background:rgba(0,0,0,.03);position:sticky;top:0;backdrop-filter:blur(8px);z-index:10}
     [data-theme="dark"] .head{background:rgba(255,255,255,.03)}
-    .body{padding:12px 16px;display:grid;gap:8px}
-    .row>div,.row>label{padding:10px 8px}
-    .row.head>div{font-weight:600;color:var(--accent)}
-    .size{font-weight:600}
-    .field{display:flex;gap:8px;align-items:center}
-    input[type="number"]{width:100%;padding:10px 12px;border-radius:12px;border:1px solid rgba(0,0,0,.12);background:#fff;color:var(--text)}
-    input[type="number"]:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(77,163,255,.2)}
-    [data-theme="dark"] input[type="number"]{background:#0e152b;border:1px solid rgba(255,255,255,.12);color:var(--text)}
-    .unit{opacity:.7;font-size:12px}
+    .body{padding:8px 16px;display:grid;gap:6px}
+    .row>div,.row>label{padding:8px 6px;font-size:14px}
+    .row.head>div{font-weight:600;color:var(--accent);font-size:13px}
+    .size{font-weight:600;font-size:12px;line-height:1.2}
+    .field{display:flex;gap:4px;align-items:center}
+    input[type="number"],select{width:100%;padding:12px 8px;border-radius:12px;border:2px solid var(--border-light);background:#fff;color:var(--text);transition:.2s all;font-size:16px;-webkit-appearance:none;appearance:none}
+    input[type="number"]:focus,select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(77,163,255,.2)}
+    input[type="number"]:invalid{border-color:var(--warn)}
+    [data-theme="dark"] input[type="number"],[data-theme="dark"] select{background:#0e152b;border:2px solid var(--border-dark);color:var(--text)}
+    .unit{opacity:.7;font-size:11px;white-space:nowrap}
     .muted{color:var(--muted)}
-    .pill{display:inline-flex;gap:6px;align-items:center;padding:6px 10px;border-radius:999px;background:rgba(0,0,0,.06);border:1px solid rgba(0,0,0,.08);font-size:12px}
-    [data-theme="dark"] .pill{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08)}
-    .controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin:16px 0}
-    button{cursor:pointer;border:1px solid rgba(0,0,0,.12);background:#fff;color:var(--text);padding:10px 14px;border-radius:12px}
-    button:hover{border-color:var(--accent)}
-    [data-theme="dark"] button{background:#0e152b;border:1px solid rgba(255,255,255,.12);color:var(--text)}
-    .footer{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:14px 16px;color:var(--muted);border-top:1px dashed rgba(0,0,0,.12)}
-    [data-theme="dark"] .footer{border-top:1px dashed rgba(255,255,255,.12)}
-    .kpi{display:flex;gap:14px;flex-wrap:wrap}
+    .pill{display:inline-flex;gap:6px;align-items:center;padding:8px 12px;border-radius:999px;background:rgba(0,0,0,.06);border:1px solid var(--border-light);font-size:14px;min-height:44px}
+    [data-theme="dark"] .pill{background:rgba(255,255,255,.06);border:1px solid var(--border-dark)}
+    .controls{display:flex;flex-direction:column;gap:12px;margin:16px 0}
+    .controls-row{display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between;align-items:center}
+    button{cursor:pointer;border:2px solid var(--border-light);background:#fff;color:var(--text);padding:12px 16px;border-radius:12px;transition:.2s all;font-size:14px;min-height:44px;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+    button:hover,button:active{border-color:var(--accent);background:rgba(0,123,255,.05);transform:translateY(0)}
+    [data-theme="dark"] button{background:#0e152b;border:2px solid var(--border-dark);color:var(--text)}
+    [data-theme="dark"] button:hover,[data-theme="dark"] button:active{background:rgba(77,163,255,.1)}
+    .footer{display:flex;flex-direction:column;gap:12px;padding:14px 16px;color:var(--muted);border-top:1px dashed var(--border-light)}
+    [data-theme="dark"] .footer{border-top:1px dashed var(--border-dark)}
+    .footer-formula{font-size:12px;text-align:center}
+    .kpi{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
     .highlight-card{
-      padding:8px 14px;
+      padding:10px 14px;
       border-radius:12px;
       font-weight:700;
-      font-size:15px;
+      font-size:13px;
       box-shadow:0 3px 8px rgba(0,0,0,.15);
+      transition:.2s transform;
+      text-align:center;
+      flex:1;
+      min-width:120px;
     }
+    .highlight-card:active{transform:scale(0.98)}
     .highlight-best{background:var(--ok);color:#fff;}
     .highlight-worst{background:var(--warn);color:#fff;}
-    .summary{margin-top:24px;padding:16px;border-radius:16px;background:rgba(0,0,0,.05);border:1px dashed rgba(0,0,0,.15)}
-    [data-theme="dark"] .summary{background:rgba(255,255,255,.05);border:1px dashed rgba(255,255,255,.15)}
+    .summary{margin-top:24px;padding:16px;border-radius:16px;background:rgba(0,0,0,.05);border:1px dashed var(--border-light);font-size:14px}
+    [data-theme="dark"] .summary{background:rgba(255,255,255,.05);border:1px dashed var(--border-dark)}
+    .summary h3{margin:0 0 12px;font-size:16px}
     a{color:var(--accent);text-decoration:none}
+    .toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-100%);background:var(--card);border:2px solid var(--border-light);border-radius:12px;padding:12px 16px;box-shadow:0 4px 12px var(--shadow-light);z-index:1000;transition:.3s transform;max-width:90vw;text-align:center}
+    .toast.show{transform:translateX(-50%) translateY(0)}
+    [data-theme="dark"] .toast{border:2px solid var(--border-dark);box-shadow:0 4px 12px var(--shadow-dark)}
+    .custom-row{border:2px dashed var(--accent);border-radius:12px;padding:8px;margin:4px 0}
+    .remove-btn{background:var(--warn);color:#fff;border:none;padding:8px 12px;border-radius:8px;font-size:12px;margin-left:4px;min-height:40px;touch-action:manipulation}
+    .add-custom{background:var(--ok);color:#fff;border:none;padding:12px 16px;border-radius:12px;margin:0;min-height:44px}
+    
+    /* 手机专用优化 */
     @media (max-width: 800px){
-      .row{grid-template-columns:100px 1fr 1fr 1fr 1fr 1fr}
-      .hide-sm{display:none}
+      .wrap{margin:16px auto;padding:0 12px}
+      h1{font-size:20px;margin-bottom:8px}
+      .sub{font-size:13px;margin-bottom:16px}
+      .row{grid-template-columns:100px 1fr 1fr 1fr;gap:6px;min-height:50px}
+      .per100,.perL{display:none!important}
+      .head{padding:10px 12px}
+      .body{padding:6px 12px}
+      .row>div,.row>label{padding:6px 4px;font-size:13px}
+      .row.head>div{font-size:12px}
+      .size{font-size:11px}
+      input[type="number"],select{padding:10px 6px;font-size:16px;border-radius:8px}
+      .unit{font-size:10px}
+      .controls{margin:12px 0}
+      .controls-row{flex-direction:column;align-items:stretch}
+      .pill{justify-content:center;text-align:center}
+      .pill select{width:auto;margin:0}
+      button{padding:12px;font-size:13px;border-radius:8px}
+      .kpi{gap:6px}
+      .highlight-card{padding:8px 10px;font-size:12px;min-width:100px}
+      .footer{padding:12px}
+      .footer-formula{font-size:11px}
+      .summary{padding:12px;font-size:13px;margin-top:16px}
+      .summary h3{font-size:15px;margin-bottom:8px}
+      .toast{top:10px;left:10px;right:10px;transform:translateY(-100%);max-width:none}
+      .toast.show{transform:translateY(0)}
+    }
+    
+    @media (max-width: 500px){
+      .wrap{padding:0 8px}
+      .row{grid-template-columns:80px 1fr 1fr 1fr;gap:4px}
+      .row>div,.row>label{padding:4px 2px;font-size:12px}
+      .size{font-size:10px}
+      input[type="number"]{padding:8px 4px;font-size:16px}
+      .controls-row{gap:6px}
+      button{padding:10px 8px;font-size:12px;min-height:40px}
+      .add-custom{padding:10px 12px}
+      .remove-btn{padding:6px 8px;min-height:36px}
+      .highlight-card{padding:6px 8px;font-size:11px;min-width:80px}
+      .kpi{gap:4px}
+    }
+    
+    /* 横屏优化 */
+    @media (max-width: 800px) and (orientation: landscape){
+      .wrap{margin:8px auto}
+      h1{font-size:18px;margin-bottom:6px}
+      .sub{margin-bottom:12px}
+      .controls{margin:8px 0}
+      .controls-row{flex-direction:row;flex-wrap:wrap}
+      .summary{margin-top:12px}
+    }
+    
+    /* 减少动画（节省电量） */
+    @media (prefers-reduced-motion: reduce){
+      *{transition:none!important;animation:none!important}
+    }
+    
+    /* 高对比度支持 */
+    @media (prefers-contrast: high){
+      input[type="number"],select,button{border-width:3px}
+    }
+    
+    /* 触摸目标优化 */
+    input,button,select{min-height:44px}
+    @media (pointer: coarse){
+      input,button,select{min-height:48px}
+    }
+    
+    /* 防止缩放时布局错乱 */
+    .row{overflow-x:auto}
+    
+    /* iOS Safari 优化 */
+    input[type="number"]{-webkit-appearance:none;-moz-appearance:textfield}
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+    
+    /* 键盘弹出时的优化 */
+    @media (max-height: 500px){
+      .summary{display:none}
+      .footer-formula{display:none}
     }
   </style>
 </head>
 <body data-theme="light">
   <div class="wrap">
-    <h1>东方树叶三得利价格计算器（建议每升5.5元可冲）</h1>
-    <div class="sub">输入总价与瓶数，自动计算 <strong>每毫升</strong>、<strong>每100ml</strong>、<strong>每升(1000ml)</strong> 的单价，并标记最划算容量。还会统计一次购物的总体均价。</div>
+    <h1>东方树叶三得利价格计算器</h1>
+    <div class="sub">输入总价与瓶数，自动计算单价并标记最划算容量。建议每升<strong>≤5.5元</strong>可冲。</div>
 
     <div class="controls">
-      <div class="pill">货币符号：
-        <select id="currency" style="margin-left:8px;border-radius:10px;padding:6px 10px">
-          <option value="¥">¥ 人民币</option>
-          <option value="$">$ 美元</option>
-          <option value="€">€ 欧元</option>
-        </select>
+      <div class="controls-row">
+        <div class="pill">💰 
+          <select id="currency">
+            <option value="¥">¥ 人民币</option>
+            <option value="$">$ 美元</option>
+            <option value="€">€ 欧元</option>
+            <option value="£">£ 英镑</option>
+          </select>
+        </div>
       </div>
-      <div style="display:flex;gap:10px">
-        <button id="reset">清空</button>
-        <button id="demo">示例数据</button>
-        <button id="toggleTheme">切换主题</button>
+      <div class="controls-row">
+        <button id="addCustom" class="add-custom">➕ 自定义容量</button>
+        <button id="demo">📝 示例</button>
+        <button id="reset">🗑️ 清空</button>
+        <button id="export">📤 导出</button>
+        <button id="import">📥 导入</button>
+        <button id="toggleTheme">🌙 主题</button>
       </div>
     </div>
 
     <div class="card" role="table" aria-label="价格计算表">
       <div class="row head" role="row">
-        <div class="size" role="columnheader">容量</div>
+        <div class="size" role="columnheader">容量规格</div>
         <div role="columnheader">总价</div>
         <div role="columnheader">瓶数</div>
         <div role="columnheader">每毫升</div>
-        <div class="hide-sm" role="columnheader">每100ml</div>
-        <div class="hide-sm" role="columnheader">每升</div>
+        <div class="per100" role="columnheader">每100ml</div>
+        <div class="perL" role="columnheader">每升</div>
       </div>
       <div class="body" id="rows"></div>
       <div class="footer">
-        <div class="muted">公式：每毫升单价 = 总价 ÷ (瓶数 × 容量ml)</div>
+        <div class="footer-formula">公式：每毫升单价 = 总价 ÷ (瓶数 × 容量ml)</div>
         <div class="kpi">
-          <span id="bestBadge" class="highlight-card highlight-best">最划算：—</span>
-          <span id="worstBadge" class="highlight-card highlight-worst">最贵：—</span>
+          <span id="bestBadge" class="highlight-card highlight-best">最划算：--</span>
+          <span id="worstBadge" class="highlight-card highlight-worst">最贵：--</span>
         </div>
       </div>
     </div>
 
     <div class="summary" id="summaryBox">
-      <h3>购物总计</h3>
+      <h3>📊 购物总计</h3>
       <div id="summaryResult">请填写数据以查看总计结果。</div>
     </div>
 
-    <p class="muted" style="margin-top:12px">提示：仅比较单位 <em>毫升</em> 的价格，未考虑促销、运费等因素。</p>
+    <p class="muted" style="margin-top:12px;font-size:12px;text-align:center">💡 数据自动保存到本地，仅比较单位毫升价格</p>
   </div>
 
+  <input type="file" id="fileInput" accept=".json" style="display:none">
+
 <script>
-(function(){
-  // 容量与名称
-  const sizes = [
-    {name:'东方树叶335ml', size:335},
-    {name:'东方树叶500ml', size:500},
-    {name:'三得利500ml', size:500},
-    {name:'东方树叶900ml', size:900},
-    {name:'三得利1250ml', size:1250},
-    {name:'东方树叶1500ml', size:1500},
-  ];
+class PriceCalculator {
+  constructor() {
+    this.sizes = [
+      {name:'东方树叶335ml', size:335},
+      {name:'东方树叶500ml', size:500},
+      {name:'三得利500ml', size:500},
+      {name:'东方树叶900ml', size:900},
+      {name:'三得利1250ml', size:1250},
+      {name:'东方树叶1500ml', size:1500},
+    ];
+    
+    this.state = new Map();
+    this.customCounter = 0;
+    this.debounceTimer = null;
+    this.isMobile = window.innerWidth <= 800;
+    
+    this.elements = {
+      rows: document.getElementById('rows'),
+      currency: document.getElementById('currency'),
+      bestBadge: document.getElementById('bestBadge'),
+      worstBadge: document.getElementById('worstBadge'),
+      summaryResult: document.getElementById('summaryResult'),
+      fileInput: document.getElementById('fileInput')
+    };
+    
+    this.init();
+  }
 
-  const rowsEl = document.getElementById('rows');
-  const currencyEl = document.getElementById('currency');
-  const bestBadge = document.getElementById('bestBadge');
-  const worstBadge = document.getElementById('worstBadge');
-  const summaryResult = document.getElementById('summaryResult');
+  init() {
+    this.createInitialRows();
+    this.bindEvents();
+    this.loadTheme();
+    this.loadData();
+    this.compute();
+    this.handleResize();
+  }
 
-  const state = new Map();
+  handleResize() {
+    window.addEventListener('resize', () => {
+      this.isMobile = window.innerWidth <= 800;
+    });
+    
+    // 处理键盘弹出
+    let initialHeight = window.innerHeight;
+    window.addEventListener('resize', () => {
+      if (this.isMobile && window.innerHeight < initialHeight * 0.75) {
+        document.body.classList.add('keyboard-open');
+      } else {
+        document.body.classList.remove('keyboard-open');
+      }
+    });
+  }
 
-  function createRow(item, isCustom=false){
+  createInitialRows() {
+    this.sizes.forEach(item => this.createRow(item));
+  }
+
+  createRow(item, isCustom = false) {
     const row = document.createElement('div');
-    row.className = 'row';
+    row.className = `row ${isCustom ? 'custom-row' : ''}`;
+    row.setAttribute('data-size', isCustom ? 'custom' : item.size);
 
     const c0 = document.createElement('div');
-    if(isCustom){
-      c0.innerHTML = `<input type="number" min="0" step="1" placeholder="自定义容量ml" style="width:100%">`;
+    if (isCustom) {
+      c0.innerHTML = `
+        <div style="display:flex;align-items:center;gap:2px;flex-wrap:wrap">
+          <input type="number" min="1" step="1" placeholder="ml" style="width:50px;flex:1;min-width:40px" title="输入容量(毫升)" inputmode="numeric">
+          <button class="remove-btn" title="删除此行">×</button>
+        </div>
+      `;
     } else {
-      c0.innerHTML = `<span class="size">${item.name}</span>`;
+      const displayName = this.isMobile ? item.name.replace('东方树叶', '东方').replace('三得利', '三得') : item.name;
+      c0.innerHTML = `<span class="size" title="${item.name}">${displayName}</span>`;
     }
 
-    const priceWrap = document.createElement('div');
-    priceWrap.className = 'field';
-    const price = document.createElement('input');
-    price.type = 'number'; price.min = '0'; price.step = '0.01'; price.placeholder = '如 12.90';
-    price.setAttribute('inputmode','decimal');
-    priceWrap.appendChild(price);
-
-    const countWrap = document.createElement('div');
-    countWrap.className = 'field';
-    const count = document.createElement('input');
-    count.type = 'number'; count.min = '0'; count.step = '1'; count.placeholder = '如 6';
-    count.setAttribute('inputmode','numeric');
-    countWrap.appendChild(count);
+    const priceWrap = this.createInputField('decimal', '12.90', '总价');
+    const countWrap = this.createInputField('numeric', '6', '瓶数');
 
     const perMl = document.createElement('div');
-    const per100 = document.createElement('div'); per100.className = 'hide-sm';
-    const perL = document.createElement('div'); perL.className = 'hide-sm';
+    const per100 = document.createElement('div'); 
+    per100.className = 'per100';
+    const perL = document.createElement('div'); 
+    perL.className = 'perL';
 
     row.append(c0, priceWrap, countWrap, perMl, per100, perL);
-    rowsEl.appendChild(row);
+    this.elements.rows.appendChild(row);
 
-    const key = isCustom ? 'custom' : `${item.name}-${item.size}`;
-    state.set(key, {sizeInput:isCustom? c0.querySelector('input'):null, size:item.size, price, count, perMl, per100, perL});
+    const key = isCustom ? `custom-${++this.customCounter}` : `${item.name}-${item.size}`;
+    const stateObj = {
+      row,
+      sizeInput: isCustom ? c0.querySelector('input[type="number"]') : null,
+      size: item.size,
+      price: priceWrap.querySelector('input'),
+      count: countWrap.querySelector('input'),
+      perMl, per100, perL
+    };
+    
+    this.state.set(key, stateObj);
 
-    price.addEventListener('input', compute);
-    count.addEventListener('input', compute);
-    if(isCustom) c0.querySelector('input').addEventListener('input', compute);
+    // 绑定事件
+    stateObj.price.addEventListener('input', () => this.debouncedCompute());
+    stateObj.count.addEventListener('input', () => this.debouncedCompute());
+    
+    // 移动端优化：失焦时自动计算
+    if (this.isMobile) {
+      stateObj.price.addEventListener('blur', () => this.compute());
+      stateObj.count.addEventListener('blur', () => this.compute());
+    }
+    
+    if (isCustom) {
+      stateObj.sizeInput.addEventListener('input', () => this.debouncedCompute());
+      if (this.isMobile) {
+        stateObj.sizeInput.addEventListener('blur', () => this.compute());
+      }
+      c0.querySelector('.remove-btn').addEventListener('click', () => this.removeCustomRow(key));
+    }
+
+    // 添加输入验证
+    this.addInputValidation(stateObj.price);
+    this.addInputValidation(stateObj.count);
+    if (stateObj.sizeInput) this.addInputValidation(stateObj.sizeInput);
+
+    return key;
   }
 
-  sizes.forEach(item => createRow(item));
-  createRow({name:'自定义', size:0}, true); // 自定义行
-
-  function formatMoney(v){
-    if (!isFinite(v)) return '—';
-    const cur = currencyEl.value;
-    return `${cur}${v.toFixed(4)}`;
+  createInputField(inputMode, placeholder, title) {
+    const wrap = document.createElement('div');
+    wrap.className = 'field';
+    const input = document.createElement('input');
+    input.type = 'number';
+    input.min = '0';
+    input.step = inputMode === 'decimal' ? '0.01' : '1';
+    input.placeholder = placeholder;
+    input.title = title;
+    input.setAttribute('inputmode', inputMode);
+    
+    // 移动端防止缩放
+    if (this.isMobile) {
+      input.style.fontSize = '16px';
+    }
+    
+    wrap.appendChild(input);
+    return wrap;
   }
 
-  function compute(){
-    let best = {size:null, value:Infinity};
-    let worst = {size:null, value:-Infinity};
+  addInputValidation(input) {
+    input.addEventListener('blur', (e) => {
+      const value = parseFloat(e.target.value);
+      if (e.target.value && (!isFinite(value) || value < 0)) {
+        e.target.classList.add('error');
+        this.showToast('请输入有效的正数', 'error');
+      } else {
+        e.target.classList.remove('error');
+        if (e.target.value) e.target.classList.add('success');
+      }
+    });
+
+    input.addEventListener('input', (e) => {
+      e.target.classList.remove('error', 'success');
+    });
+    
+    // 移动端：数字键盘优化
+    if (this.isMobile) {
+      input.addEventListener('focus', (e) => {
+        // 滚动到可见区域
+        setTimeout(() => {
+          e.target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 300);
+      });
+    }
+  }
+
+  removeCustomRow(key) {
+    const stateObj = this.state.get(key);
+    if (stateObj && stateObj.row) {
+      stateObj.row.remove();
+      this.state.delete(key);
+      this.debouncedCompute();
+      this.saveData();
+      this.showToast('已删除自定义行', 'success');
+    }
+  }
+
+  bindEvents() {
+    document.getElementById('addCustom').addEventListener('click', () => {
+      this.createRow({name:'自定义', size:0}, true);
+      this.saveData();
+      this.showToast('已添加自定义行', 'success');
+    });
+
+    document.getElementById('reset').addEventListener('click', () => {
+      this.resetAll();
+    });
+
+    document.getElementById('demo').addEventListener('click', () => this.loadDemo());
+    document.getElementById('export').addEventListener('click', () => this.exportData());
+    document.getElementById('import').addEventListener('click', () => this.elements.fileInput.click());
+    document.getElementById('toggleTheme').addEventListener('click', () => this.toggleTheme());
+
+    this.elements.currency.addEventListener('change', () => {
+      this.compute();
+      this.saveData();
+    });
+
+    this.elements.fileInput.addEventListener('change', (e) => this.importData(e));
+
+    // 移动端：简化键盘快捷键
+    if (!this.isMobile) {
+      document.addEventListener('keydown', (e) => {
+        if (e.ctrlKey || e.metaKey) {
+          switch(e.key) {
+            case 'r': e.preventDefault(); this.resetAll(); break;
+            case 'd': e.preventDefault(); this.loadDemo(); break;
+            case 's': e.preventDefault(); this.exportData(); break;
+          }
+        }
+      });
+    }
+  }
+
+  debouncedCompute() {
+    clearTimeout(this.debounceTimer);
+    const delay = this.isMobile ? 500 : 300; // 移动端延长防抖时间
+    this.debounceTimer = setTimeout(() => {
+      this.compute();
+      this.saveData();
+    }, delay);
+  }
+
+  formatMoney(value, precision = 4) {
+    if (!isFinite(value)) return '--';
+    const currency = this.elements.currency.value;
+    return `${currency}${value.toFixed(precision)}`;
+  }
+
+  compute() {
+    let best = {size: null, value: Infinity, name: ''};
+    let worst = {size: null, value: -Infinity, name: ''};
     let totalPrice = 0;
     let totalMl = 0;
+    let validEntries = 0;
 
-    for(const [key, obj] of state.entries()){
+    for (const [key, obj] of this.state.entries()) {
       const {sizeInput, size, price, count, perMl, per100, perL} = obj;
-      const s = sizeInput ? parseFloat(sizeInput.value) : size;
-      const p = parseFloat(price.value);
-      const n = parseFloat(count.value);
-      const unit = (isFinite(p) && isFinite(n) && n>0 && isFinite(s) && s>0) ? (p / (n * s)) : NaN;
+      const currentSize = sizeInput ? parseFloat(sizeInput.value) : size;
+      const currentPrice = parseFloat(price.value);
+      const currentCount = parseFloat(count.value);
+      
+      const isValid = isFinite(currentPrice) && isFinite(currentCount) && 
+                     currentCount > 0 && isFinite(currentSize) && currentSize > 0;
+      
+      if (isValid) {
+        const unitPrice = currentPrice / (currentCount * currentSize);
+        
+        perMl.innerHTML = `${this.formatMoney(unitPrice)} <span class="unit">/ ml</span>`;
+        
+        if (!this.isMobile) {
+          per100.innerHTML = `${this.formatMoney(unitPrice * 100)} <span class="unit">/ 100ml</span>`;
+        }
+        
+        const perLiterPrice = unitPrice * 1000;
+        const isGoodDeal = perLiterPrice <= 5.5;
+        const dealIcon = isGoodDeal ? '✅' : '';
+        
+        if (this.isMobile) {
+          perL.innerHTML = `${this.formatMoney(perLiterPrice)} <span class="unit">/ L</span> ${dealIcon}`;
+        } else {
+          perL.innerHTML = `${this.formatMoney(perLiterPrice)} <span class="unit">/ 升</span> ${dealIcon}`;
+        }
 
-      perMl.textContent   = formatMoney(unit) + ' / ml';
-      per100.textContent  = isFinite(unit) ? formatMoney(unit * 100) + ' / 100ml' : '—';
-      perL.textContent    = isFinite(unit) ? formatMoney(unit * 1000) + ' / 升' : '—';
-
-      if(isFinite(unit)){
-        if(unit < best.value) best = {size:s, value:unit};
-        if(unit > worst.value) worst = {size:s, value:unit};
-        totalPrice += p;
-        totalMl += n * s;
+        if (unitPrice < best.value) {
+          best = {size: currentSize, value: unitPrice, name: this.getSizeName(key)};
+        }
+        if (unitPrice > worst.value) {
+          worst = {size: currentSize, value: unitPrice, name: this.getSizeName(key)};
+        }
+        
+        totalPrice += currentPrice;
+        totalMl += currentCount * currentSize;
+        validEntries++;
+      } else {
+        perMl.textContent = '--';
+        if (!this.isMobile) per100.textContent = '--';
+        perL.textContent = '--';
       }
     }
 
-    bestBadge.textContent = best.size ? `最划算：${best.size}ml (${formatMoney(best.value)}/ml)` : '最划算：—';
-    worstBadge.textContent = worst.size ? `最贵：${worst.size}ml (${formatMoney(worst.value)}/ml)` : '最贵：—';
-
-    if(totalPrice>0 && totalMl>0){
-      const unit = totalPrice / totalMl;
-      summaryResult.innerHTML = `本次总计 ${formatMoney(totalPrice)}，总容量 ${totalMl}ml<br>`+
-        `平均单价：${formatMoney(unit)} / ml ， ${formatMoney(unit*100)} / 100ml ， ${formatMoney(unit*1000)} / 升`;
-    } else summaryResult.textContent = '请填写数据以查看总计结果。';
+    this.updateBadges(best, worst);
+    this.updateSummary(totalPrice, totalMl, validEntries);
   }
 
-  document.getElementById('reset').addEventListener('click', ()=>{
-    for(const {sizeInput, price, count} of state.values()){ 
-      if(sizeInput) sizeInput.value='';
-      price.value=''; count.value='';
-    }
-    compute();
-  });
+  getSizeName(key) {
+    if (key.startsWith('custom-')) return '自定义';
+    const name = key.split('-')[0];
+    return this.isMobile ? name.replace('东方树叶', '东方').replace('三得利', '三得') : name;
+  }
 
-  document.getElementById('demo').addEventListener('click', ()=>{
+  updateBadges(best, worst) {
+    this.elements.bestBadge.textContent = best.size ? 
+      `最划算：${best.name} (${this.formatMoney(best.value)}/ml)` : '最划算：--';
+    
+    this.elements.worstBadge.textContent = worst.size ? 
+      `最贵：${worst.name} (${this.formatMoney(worst.value)}/ml)` : '最贵：--';
+  }
+
+  updateSummary(totalPrice, totalMl, validEntries) {
+    if (totalPrice > 0 && totalMl > 0) {
+      const avgUnitPrice = totalPrice / totalMl;
+      const avgPerLiter = avgUnitPrice * 1000;
+      const isGoodDeal = avgPerLiter <= 5.5;
+      
+      if (this.isMobile) {
+        this.elements.summaryResult.innerHTML = `
+          <div style="margin-bottom:6px">
+            <strong>共 ${validEntries} 种商品</strong>
+          </div>
+          <div style="margin-bottom:6px">
+            总计：${this.formatMoney(totalPrice, 2)} | ${(totalMl/1000).toFixed(1)}L
+          </div>
+          <div>
+            平均：${this.formatMoney(avgPerLiter)} / 升 ${isGoodDeal ? '✅ 划算' : '⚠️ 偏贵'}
+          </div>
+        `;
+      } else {
+        this.elements.summaryResult.innerHTML = `
+          <div style="margin-bottom:8px">
+            <strong>本次购物统计：</strong>共 ${validEntries} 种商品
+          </div>
+          <div style="margin-bottom:8px">
+            总金额：${this.formatMoney(totalPrice, 2)} | 总容量：${totalMl.toLocaleString()}ml
+          </div>
+          <div>
+            平均单价：${this.formatMoney(avgUnitPrice)} / ml | 
+            ${this.formatMoney(avgUnitPrice * 100)} / 100ml | 
+            ${this.formatMoney(avgPerLiter)} / 升 ${isGoodDeal ? '✅ 划算' : '⚠️ 偏贵'}
+          </div>
+        `;
+      }
+    } else {
+      this.elements.summaryResult.textContent = '请填写数据以查看总计结果。';
+    }
+  }
+
+  resetAll() {
+    // 删除所有自定义行
+    for (const [key, obj] of this.state.entries()) {
+      if (key.startsWith('custom-')) {
+        obj.row.remove();
+        this.state.delete(key);
+      }
+    }
+    
+    // 清空所有输入
+    for (const {sizeInput, price, count} of this.state.values()) {
+      if (sizeInput) sizeInput.value = '';
+      price.value = '';
+      count.value = '';
+      price.classList.remove('error', 'success');
+      count.classList.remove('error', 'success');
+    }
+    
+    this.compute();
+    this.saveData();
+    this.showToast('已清空所有数据', 'success');
+  }
+
+  loadDemo() {
     const demo = {
-      '东方树叶335ml-335': {price: 51.9, count: 24},
+      '东方树叶335ml-335': {price: 51.9, count:24},
       '东方树叶500ml-500': {price: 48.0, count: 15},
       '三得利500ml-500': {price: 37.85, count: 15},
       '东方树叶900ml-900': {price: 57.0, count: 12},
       '三得利1250ml-1250': {price: 23.2, count: 4},
       '东方树叶1500ml-1500': {price: 50.4, count: 6},
     };
-    for(const [key, obj] of state.entries()){
+
+    for (const [key, obj] of this.state.entries()) {
       const {sizeInput, price, count} = obj;
-      if(key !== 'custom'){
-        price.value = demo[key]?.price ?? '';
-        count.value = demo[key]?.count ?? '';
-      } else { price.value=''; count.value=''; if(sizeInput) sizeInput.value=''; }
+      if (!key.startsWith('custom-')) {
+        const demoData = demo[key];
+        price.value = demoData?.price ?? '';
+        count.value = demoData?.count ?? '';
+      }
     }
-    compute();
-  });
+    
+    this.compute();
+    this.saveData();
+    this.showToast('已加载示例数据', 'success');
+  }
 
-  currencyEl.addEventListener('change', compute);
+  saveData() {
+    try {
+      const data = {
+        currency: this.elements.currency.value,
+        entries: {},
+        customRows: []
+      };
 
-  document.getElementById('toggleTheme').addEventListener('click', ()=>{
+      for (const [key, obj] of this.state.entries()) {
+        if (key.startsWith('custom-')) {
+          data.customRows.push({
+            size: obj.sizeInput ? obj.sizeInput.value : '',
+            price: obj.price.value,
+            count: obj.count.value
+          });
+        } else {
+          data.entries[key] = {
+            price: obj.price.value,
+            count: obj.count.value
+          };
+        }
+      }
+
+      localStorage.setItem('priceCalculatorData', JSON.stringify(data));
+    } catch (e) {
+      console.warn('保存数据失败:', e);
+    }
+  }
+
+  loadData() {
+    try {
+      const saved = localStorage.getItem('priceCalculatorData');
+      if (!saved) return;
+
+      const data = JSON.parse(saved);
+      
+      if (data.currency) {
+        this.elements.currency.value = data.currency;
+      }
+
+      if (data.entries) {
+        for (const [key, values] of Object.entries(data.entries)) {
+          const obj = this.state.get(key);
+          if (obj) {
+            obj.price.value = values.price || '';
+            obj.count.value = values.count || '';
+          }
+        }
+      }
+
+      if (data.customRows) {
+        data.customRows.forEach(row => {
+          const key = this.createRow({name:'自定义', size:0}, true);
+          const obj = this.state.get(key);
+          if (obj) {
+            if (obj.sizeInput) obj.sizeInput.value = row.size || '';
+            obj.price.value = row.price || '';
+            obj.count.value = row.count || '';
+          }
+        });
+      }
+    } catch (e) {
+      console.warn('加载数据失败:', e);
+    }
+  }
+
+  exportData() {
+    try {
+      const data = {
+        timestamp: new Date().toISOString(),
+        currency: this.elements.currency.value,
+        entries: {},
+        customRows: []
+      };
+
+      for (const [key, obj] of this.state.entries()) {
+        if (key.startsWith('custom-')) {
+          data.customRows.push({
+            size: obj.sizeInput ? obj.sizeInput.value : '',
+            price: obj.price.value,
+            count: obj.count.value
+          });
+        } else {
+          data.entries[key] = {
+            price: obj.price.value,
+            count: obj.count.value
+          };
+        }
+      }
+
+      const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `价格计算器数据_${new Date().toISOString().slice(0,10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      
+      this.showToast('数据已导出', 'success');
+    } catch (e) {
+      this.showToast('导出失败', 'error');
+    }
+  }
+
+  importData(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const data = JSON.parse(e.target.result);
+        
+        this.resetAll();
+        
+        if (data.currency) {
+          this.elements.currency.value = data.currency;
+        }
+
+        if (data.entries) {
+          for (const [key, values] of Object.entries(data.entries)) {
+            const obj = this.state.get(key);
+            if (obj) {
+              obj.price.value = values.price || '';
+              obj.count.value = values.count || '';
+            }
+          }
+        }
+
+        if (data.customRows) {
+          data.customRows.forEach(row => {
+            const key = this.createRow({name:'自定义', size:0}, true);
+            const obj = this.state.get(key);
+            if (obj) {
+              if (obj.sizeInput) obj.sizeInput.value = row.size || '';
+              obj.price.value = row.price || '';
+              obj.count.value = row.count || '';
+            }
+          });
+        }
+
+        this.compute();
+        this.saveData();
+        this.showToast('数据导入成功', 'success');
+      } catch (e) {
+        this.showToast('导入失败：文件格式错误', 'error');
+      }
+    };
+    reader.readAsText(file);
+    event.target.value = '';
+  }
+
+  toggleTheme() {
     const body = document.body;
-    body.setAttribute('data-theme', body.getAttribute('data-theme')==='light'?'dark':'light');
-  });
+    const currentTheme = body.getAttribute('data-theme');
+    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+    body.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+    
+    const icon = newTheme === 'dark' ? '☀️' : '🌙';
+    document.getElementById('toggleTheme').innerHTML = `${icon} 主题`;
+  }
 
-  compute();
-})();
+  loadTheme() {
+    const saved = localStorage.getItem('theme');
+    if (saved && ['light', 'dark'].includes(saved)) {
+      document.body.setAttribute('data-theme', saved);
+      const icon = saved === 'dark' ? '☀️' : '🌙';
+      document.getElementById('toggleTheme').innerHTML = `${icon} 主题`;
+    }
+  }
+
+  showToast(message, type = 'info') {
+    const existingToast = document.querySelector('.toast');
+    if (existingToast) existingToast.remove();
+
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.textContent = message;
+    
+    if (type === 'error') toast.style.borderLeftColor = 'var(--warn)';
+    else if (type === 'success') toast.style.borderLeftColor = 'var(--ok)';
+    else toast.style.borderLeftColor = 'var(--accent)';
+    
+    document.body.appendChild(toast);
+    
+    setTimeout(() => toast.classList.add('show'), 10);
+    
+    // 移动端显示时间稍短
+    const hideDelay = this.isMobile ? 2500 : 3000;
+    setTimeout(() => {
+      toast.classList.remove('show');
+      setTimeout(() => toast.remove(), 300);
+    }, hideDelay);
+  }
+}
+
+// 初始化应用
+document.addEventListener('DOMContentLoaded', () => {
+  new PriceCalculator();
+});
 </script>
 </body>
 </html>
