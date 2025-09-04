@@ -20,18 +20,82 @@
     .sub{color:var(--muted);margin-bottom:20px;font-size:14px;line-height:1.5}
     .card{background:var(--card);border:1px solid var(--border-light);border-radius:18px;box-shadow:0 10px 30px var(--shadow-light);overflow:hidden;transition:.3s all}
     [data-theme="dark"] .card{border:1px solid var(--border-dark);box-shadow:0 10px 30px var(--shadow-dark)}
-    .row{display:grid;grid-template-columns:120px repeat(2, 1fr) repeat(3, 1fr);gap:8px;align-items:center;min-height:60px}
+    .row{display:grid;grid-template-columns:120px 1fr 1fr 1fr 1fr 1fr;gap:8px;align-items:center;min-height:60px}
     .head{padding:12px 16px;background:rgba(0,0,0,.03);position:sticky;top:0;backdrop-filter:blur(8px);z-index:10}
     [data-theme="dark"] .head{background:rgba(255,255,255,.03)}
     .body{padding:8px 16px;display:grid;gap:6px}
     .row>div,.row>label{padding:8px 6px;font-size:14px}
     .row.head>div{font-weight:600;color:var(--accent);font-size:13px}
     .size{font-weight:600;font-size:12px;line-height:1.2}
-    .field{display:flex;gap:4px;align-items:center}
-    input[type="number"],select{width:100%;padding:12px 8px;border-radius:12px;border:2px solid var(--border-light);background:#fff;color:var(--text);transition:.2s all;font-size:16px;-webkit-appearance:none;appearance:none}
-    input[type="number"]:focus,select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(77,163,255,.2)}
-    input[type="number"]:invalid{border-color:var(--warn)}
-    [data-theme="dark"] input[type="number"],[data-theme="dark"] select{background:#0e152b;border:2px solid var(--border-dark);color:var(--text)}
+    .field{display:flex;gap:4px;align-items:center;justify-content:center}
+    
+    /* 输入框背景和边框增强样式 */
+    .input-field {
+      position: relative;
+      background: linear-gradient(135deg, rgba(0,123,255,0.08), rgba(0,123,255,0.04));
+      border: 2px solid rgba(0,123,255,0.2);
+      border-radius: 10px;
+      padding: 1px;
+      transition: all 0.3s ease;
+      max-width: 85px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    [data-theme="dark"] .input-field {
+      background: linear-gradient(135deg, rgba(77,163,255,0.12), rgba(77,163,255,0.06));
+      border: 2px solid rgba(77,163,255,0.3);
+    }
+    
+    .input-field:hover {
+      border-color: rgba(0,123,255,0.4);
+      background: linear-gradient(135deg, rgba(0,123,255,0.12), rgba(0,123,255,0.06));
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0,123,255,0.15);
+    }
+    
+    [data-theme="dark"] .input-field:hover {
+      border-color: rgba(77,163,255,0.5);
+      background: linear-gradient(135deg, rgba(77,163,255,0.18), rgba(77,163,255,0.08));
+      box-shadow: 0 4px 12px rgba(77,163,255,0.2);
+    }
+    
+    .input-field.focused {
+      border-color: var(--accent);
+      background: linear-gradient(135deg, rgba(0,123,255,0.15), rgba(0,123,255,0.08));
+      box-shadow: 0 0 0 3px rgba(0,123,255,0.1), 0 6px 16px rgba(0,123,255,0.2);
+      transform: translateY(-2px);
+    }
+    
+    [data-theme="dark"] .input-field.focused {
+      background: linear-gradient(135deg, rgba(77,163,255,0.2), rgba(77,163,255,0.1));
+      box-shadow: 0 0 0 3px rgba(77,163,255,0.15), 0 6px 16px rgba(77,163,255,0.25);
+    }
+    
+    input[type="number"]{width:100%;padding:8px 6px;border-radius:8px;border:none;background:transparent;color:var(--text);transition:.2s all;font-size:14px;-webkit-appearance:none;appearance:none;font-weight:500;text-align:center}
+    input[type="number"]:focus{outline:none}
+    input[type="number"]:invalid{color:var(--warn)}
+    [data-theme="dark"] input[type="number"]{color:var(--text)}
+    
+    /* 确保所有列的内容都居中对齐 */
+    .row > div:nth-child(2),  /* 总价列 */
+    .row > div:nth-child(3),  /* 瓶数列 */
+    .row > div:nth-child(4),  /* 每瓶列 */
+    .row > div:nth-child(5),  /* 每毫升列 */
+    .row > div:nth-child(6) { /* 每升列 */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    
+    /* 非输入字段的普通样式 */
+    select{width:100%;padding:12px 8px;border-radius:12px;border:2px solid var(--border-light);background:#fff;color:var(--text);transition:.2s all;font-size:16px;-webkit-appearance:none;appearance:none;text-align:left}
+    select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(77,163,255,.2)}
+    [data-theme="dark"] select{background:#0e152b;border:2px solid var(--border-dark);color:var(--text)}
+    
     .unit{opacity:.7;font-size:11px;white-space:nowrap}
     .muted{color:var(--muted)}
     .pill{display:inline-flex;gap:6px;align-items:center;padding:8px 12px;border-radius:999px;background:rgba(0,0,0,.06);border:1px solid var(--border-light);font-size:14px;min-height:44px}
@@ -76,14 +140,22 @@
       .wrap{margin:16px auto;padding:0 12px}
       h1{font-size:20px;margin-bottom:8px}
       .sub{font-size:13px;margin-bottom:16px}
-      .row{grid-template-columns:100px 1fr 1fr 1fr;gap:6px;min-height:50px}
-      .per100,.perL{display:none!important}
+      .row{grid-template-columns:90px 1fr 1fr 1fr 1fr;gap:6px;min-height:50px}
+      .perL{display:none!important}
       .head{padding:10px 12px}
       .body{padding:6px 12px}
       .row>div,.row>label{padding:6px 4px;font-size:13px}
       .row.head>div{font-size:12px}
       .size{font-size:11px}
-      input[type="number"],select{padding:10px 6px;font-size:16px;border-radius:8px}
+      
+      .input-field {
+        max-width: 70px;
+        padding: 1px;
+        border-radius: 8px;
+      }
+      
+      input[type="number"]{padding:8px 4px;font-size:14px;border-radius:6px}
+      
       .unit{font-size:10px}
       .controls{margin:12px 0}
       .controls-row{flex-direction:column;align-items:stretch}
@@ -102,10 +174,15 @@
     
     @media (max-width: 500px){
       .wrap{padding:0 8px}
-      .row{grid-template-columns:80px 1fr 1fr 1fr;gap:4px}
+      .row{grid-template-columns:80px 1fr 1fr 1fr 1fr;gap:4px}
       .row>div,.row>label{padding:4px 2px;font-size:12px}
       .size{font-size:10px}
-      input[type="number"]{padding:8px 4px;font-size:16px}
+      
+      .input-field {
+        max-width: 60px;
+      }
+      
+      input[type="number"]{padding:6px 3px;font-size:14px}
       .controls-row{gap:6px}
       button{padding:10px 8px;font-size:12px;min-height:40px}
       .add-custom{padding:10px 12px}
@@ -162,7 +239,7 @@
 
     <div class="controls">
       <div class="controls-row">
-        <div class="pill">💰 
+        <div class="pill">���� 
           <select id="currency">
             <option value="¥">¥ 人民币</option>
             <option value="$">$ 美元</option>
@@ -186,13 +263,13 @@
         <div class="size" role="columnheader">容量规格</div>
         <div role="columnheader">总价</div>
         <div role="columnheader">瓶数</div>
+        <div role="columnheader">每瓶</div>
         <div role="columnheader">每毫升</div>
-        <div class="per100" role="columnheader">每100ml</div>
         <div class="perL" role="columnheader">每升</div>
       </div>
       <div class="body" id="rows"></div>
       <div class="footer">
-        <div class="footer-formula">公式：每毫升单价 = 总价 ÷ (瓶数 × 容量ml)</div>
+        <div class="footer-formula">公式：每毫升单价 = 总价 ÷ (瓶数 × 容量ml)，每瓶价格 = 总价 ÷ 瓶数</div>
         <div class="kpi">
           <span id="bestBadge" class="highlight-card highlight-best">最划算：--</span>
           <span id="worstBadge" class="highlight-card highlight-worst">最贵：--</span>
@@ -289,13 +366,12 @@ class PriceCalculator {
     const priceWrap = this.createInputField('decimal', '12.90', '总价');
     const countWrap = this.createInputField('numeric', '6', '瓶数');
 
+    const perBottle = document.createElement('div');
     const perMl = document.createElement('div');
-    const per100 = document.createElement('div'); 
-    per100.className = 'per100';
     const perL = document.createElement('div'); 
     perL.className = 'perL';
 
-    row.append(c0, priceWrap, countWrap, perMl, per100, perL);
+    row.append(c0, priceWrap, countWrap, perBottle, perMl, perL);
     this.elements.rows.appendChild(row);
 
     const key = isCustom ? `custom-${++this.customCounter}` : `${item.name}-${item.size}`;
@@ -305,7 +381,7 @@ class PriceCalculator {
       size: item.size,
       price: priceWrap.querySelector('input'),
       count: countWrap.querySelector('input'),
-      perMl, per100, perL
+      perBottle, perMl, perL
     };
     
     this.state.set(key, stateObj);
@@ -338,7 +414,7 @@ class PriceCalculator {
 
   createInputField(inputMode, placeholder, title) {
     const wrap = document.createElement('div');
-    wrap.className = 'field';
+    wrap.className = 'field input-field';
     const input = document.createElement('input');
     input.type = 'number';
     input.min = '0';
@@ -351,6 +427,14 @@ class PriceCalculator {
     if (this.isMobile) {
       input.style.fontSize = '16px';
     }
+    
+    // 添加聚焦/失焦事件监听来切换样式
+    input.addEventListener('focus', () => {
+      wrap.classList.add('focused');
+    });
+    input.addEventListener('blur', () => {
+      wrap.classList.remove('focused');
+    });
     
     wrap.appendChild(input);
     return wrap;
@@ -385,7 +469,7 @@ class PriceCalculator {
 
   removeCustomRow(key) {
     const stateObj = this.state.get(key);
-    if (stateObj && stateObj.row) {
+    if (stateObj&& stateObj.row) {
       stateObj.row.remove();
       this.state.delete(key);
       this.debouncedCompute();
@@ -454,7 +538,7 @@ class PriceCalculator {
     let validEntries = 0;
 
     for (const [key, obj] of this.state.entries()) {
-      const {sizeInput, size, price, count, perMl, per100, perL} = obj;
+      const {sizeInput, size, price, count, perBottle, perMl, perL} = obj;
       const currentSize = sizeInput ? parseFloat(sizeInput.value) : size;
       const currentPrice = parseFloat(price.value);
       const currentCount = parseFloat(count.value);
@@ -464,12 +548,10 @@ class PriceCalculator {
       
       if (isValid) {
         const unitPrice = currentPrice / (currentCount * currentSize);
+        const bottlePrice = currentPrice / currentCount;
         
+        perBottle.innerHTML = `${this.formatMoney(bottlePrice, 2)} <span class="unit">/ 瓶</span>`;
         perMl.innerHTML = `${this.formatMoney(unitPrice)} <span class="unit">/ ml</span>`;
-        
-        if (!this.isMobile) {
-          per100.innerHTML = `${this.formatMoney(unitPrice * 100)} <span class="unit">/ 100ml</span>`;
-        }
         
         const perLiterPrice = unitPrice * 1000;
         const isGoodDeal = perLiterPrice <= 5.5;
@@ -492,11 +574,11 @@ class PriceCalculator {
         totalMl += currentCount * currentSize;
         validEntries++;
       } else {
+        perBottle.textContent = '--';
         perMl.textContent = '--';
-        if (!this.isMobile) per100.textContent = '--';
-        perL.textContent = '--';
+        if (!this.isMobile) perL.textContent = '--';
       }
-    }
+}
 
     this.updateBadges(best, worst);
     this.updateSummary(totalPrice, totalMl, validEntries);
@@ -544,7 +626,6 @@ class PriceCalculator {
           </div>
           <div>
             平均单价：${this.formatMoney(avgUnitPrice)} / ml | 
-            ${this.formatMoney(avgUnitPrice * 100)} / 100ml | 
             ${this.formatMoney(avgPerLiter)} / 升 ${isGoodDeal ? '✅ 划算' : '⚠️ 偏贵'}
           </div>
         `;
@@ -579,7 +660,7 @@ class PriceCalculator {
 
   loadDemo() {
     const demo = {
-      '东方树叶335ml-335': {price: 51.9, count:24},
+      '东方树叶335ml-335': {price: 51.9, count: 24},
       '东方树叶500ml-500': {price: 48.0, count: 15},
       '三得利500ml-500': {price: 37.85, count: 15},
       '东方树叶900ml-900': {price: 57.0, count: 12},
