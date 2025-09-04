@@ -9,12 +9,13 @@
       --bg:#fdfdfd;--card:#ffffff;--muted:#555;--text:#111;--accent:#007bff;--ok:#26c281;--warn:#ff6b6b;
       --border-light:rgba(0,0,0,.06);--border-dark:rgba(255,255,255,.06);
       --shadow-light:rgba(0,0,0,.1);--shadow-dark:rgba(0,0,0,.35);
+      --font-family: "PingFang SC","Hiragino Sans GB","Microsoft YaHei","SimSun",system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,sans-serif;
     }
     [data-theme="dark"]{
       --bg:#0b1020;--card:#121a33;--muted:#93a0b2;--text:#eaf1ff;--accent:#4da3ff;--ok:#26c281;--warn:#ff5c5c;
     }
     *{box-sizing:border-box}
-    body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial;transition:.3s background,.3s color;-webkit-text-size-adjust:100%;touch-action:manipulation}
+    body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 var(--font-family);transition:.3s background,.3s color;-webkit-text-size-adjust:100%;touch-action:manipulation}
     .wrap{max-width:980px;margin:32px auto;padding:0 16px}
     h1{font-size:clamp(18px,5vw,34px);letter-spacing:.5px;margin:0 0 10px;line-height:1.2}
     .sub{color:var(--muted);margin-bottom:20px;font-size:14px;line-height:1.5}
@@ -74,7 +75,7 @@
       box-shadow: 0 0 0 3px rgba(77,163,255,0.15), 0 6px 16px rgba(77,163,255,0.25);
     }
     
-    input[type="number"]{width:100%;padding:8px 6px;border-radius:8px;border:none;background:transparent;color:var(--text);transition:.2s all;font-size:14px;-webkit-appearance:none;appearance:none;font-weight:500;text-align:center}
+    input[type="number"]{width:100%;padding:8px 6px;border-radius:8px;border:none;background:transparent;color:var(--text);transition:.2s all;font-size:14px;-webkit-appearance:none;appearance:none;font-weight:500;text-align:center;font-family:var(--font-family)}
     input[type="number"]:focus{outline:none}
     input[type="number"]:invalid{color:var(--warn)}
     [data-theme="dark"] input[type="number"]{color:var(--text)}
@@ -92,9 +93,15 @@
     }
     
     /* 非输入字段的普通样式 */
-    select{width:100%;padding:12px 8px;border-radius:12px;border:2px solid var(--border-light);background:#fff;color:var(--text);transition:.2s all;font-size:16px;-webkit-appearance:none;appearance:none;text-align:left}
+    select{width:100%;padding:12px 8px;border-radius:12px;border:2px solid var(--border-light);background:#fff;color:var(--text);transition:.2s all;font-size:16px;-webkit-appearance:none;appearance:none;text-align:left;font-family:var(--font-family)}
     select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(77,163,255,.2)}
     [data-theme="dark"] select{background:#0e152b;border:2px solid var(--border-dark);color:var(--text)}
+    
+    /* 货币符号特殊处理 */
+    .currency-symbol {
+      font-family: "SimSun", "宋体", "Microsoft YaHei", serif;
+      font-weight: normal;
+    }
     
     .unit{opacity:.7;font-size:11px;white-space:nowrap}
     .muted{color:var(--muted)}
@@ -102,7 +109,7 @@
     [data-theme="dark"] .pill{background:rgba(255,255,255,.06);border:1px solid var(--border-dark)}
     .controls{display:flex;flex-direction:column;gap:12px;margin:16px 0}
     .controls-row{display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between;align-items:center}
-    button{cursor:pointer;border:2px solid var(--border-light);background:#fff;color:var(--text);padding:12px 16px;border-radius:12px;transition:.2s all;font-size:14px;min-height:44px;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+    button{cursor:pointer;border:2px solid var(--border-light);background:#fff;color:var(--text);padding:12px 16px;border-radius:12px;transition:.2s all;font-size:14px;min-height:44px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;font-family:var(--font-family)}
     button:hover,button:active{border-color:var(--accent);background:rgba(0,123,255,.05);transform:translateY(0)}
     [data-theme="dark"] button{background:#0e152b;border:2px solid var(--border-dark);color:var(--text)}
     [data-theme="dark"] button:hover,[data-theme="dark"] button:active{background:rgba(77,163,255,.1)}
@@ -128,12 +135,12 @@
     [data-theme="dark"] .summary{background:rgba(255,255,255,.05);border:1px dashed var(--border-dark)}
     .summary h3{margin:0 0 12px;font-size:16px}
     a{color:var(--accent);text-decoration:none}
-    .toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-100%);background:var(--card);border:2px solid var(--border-light);border-radius:12px;padding:12px 16px;box-shadow:0 4px 12px var(--shadow-light);z-index:1000;transition:.3s transform;max-width:90vw;text-align:center}
+    .toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-100%);background:var(--card);border:2px solid var(--border-light);border-radius:12px;padding:12px 16px;box-shadow:0 4px 12px var(--shadow-light);z-index:1000;transition:.3s transform;max-width:90vw;text-align:center;font-family:var(--font-family)}
     .toast.show{transform:translateX(-50%) translateY(0)}
     [data-theme="dark"] .toast{border:2px solid var(--border-dark);box-shadow:0 4px 12px var(--shadow-dark)}
     .custom-row{border:2px dashed var(--accent);border-radius:12px;padding:8px;margin:4px 0}
-    .remove-btn{background:var(--warn);color:#fff;border:none;padding:8px 12px;border-radius:8px;font-size:12px;margin-left:4px;min-height:40px;touch-action:manipulation}
-    .add-custom{background:var(--ok);color:#fff;border:none;padding:12px 16px;border-radius:12px;margin:0;min-height:44px}
+    .remove-btn{background:var(--warn);color:#fff;border:none;padding:8px 12px;border-radius:8px;font-size:12px;margin-left:4px;min-height:40px;touch-action:manipulation;font-family:var(--font-family)}
+    .add-custom{background:var(--ok);color:#fff;border:none;padding:12px 16px;border-radius:12px;margin:0;min-height:44px;font-family:var(--font-family)}
     
     /* 手机专用优化 */
     @media (max-width: 800px){
@@ -239,9 +246,9 @@
 
     <div class="controls">
       <div class="controls-row">
-        <div class="pill">���� 
+        <div class="pill">💰 
           <select id="currency">
-            <option value="¥">¥ 人民币</option>
+            <option value="¥"><span class="currency-symbol">¥</span> 人民币</option>
             <option value="$">$ 美元</option>
             <option value="€">€ 欧元</option>
             <option value="£">£ 英镑</option>
@@ -418,7 +425,8 @@ class PriceCalculator {
     const input = document.createElement('input');
     input.type = 'number';
     input.min = '0';
-    input.step = inputMode === 'decimal' ? '0.01' : '1';
+    // 修改step设置，允许任意小数位数
+    input.step = inputMode === 'decimal' ? 'any' : '1';
     input.placeholder = placeholder;
     input.title = title;
     input.setAttribute('inputmode', inputMode);
@@ -469,7 +477,7 @@ class PriceCalculator {
 
   removeCustomRow(key) {
     const stateObj = this.state.get(key);
-    if (stateObj&& stateObj.row) {
+    if (stateObj && stateObj.row) {
       stateObj.row.remove();
       this.state.delete(key);
       this.debouncedCompute();
@@ -578,7 +586,7 @@ class PriceCalculator {
         perMl.textContent = '--';
         if (!this.isMobile) perL.textContent = '--';
       }
-}
+    }
 
     this.updateBadges(best, worst);
     this.updateSummary(totalPrice, totalMl, validEntries);
