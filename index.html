@@ -92,10 +92,36 @@
       text-align: center;
     }
     
-    /* 非输入字段的普通样式 */
+    /* 修复下拉菜单样式 - 关键修复部分 */
     select{width:100%;padding:10px 8px;border-radius:10px;border:2px solid var(--border-light);background:#fff;color:var(--text);transition:.2s all;font-size:14px;-webkit-appearance:none;appearance:none;text-align:left;font-family:var(--font-family)}
     select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(77,163,255,.2)}
+    
+    /* 黑色主题下的select样式 */
     [data-theme="dark"] select{background:#0e152b;border:2px solid var(--border-dark);color:var(--text)}
+    
+    /* 修复下拉菜单选项在黑色主题下的显示问题 */
+    select option {
+      background: #fff;
+      color: #333;
+      padding: 8px;
+    }
+    
+    [data-theme="dark"] select option {
+      background: #0e152b;
+      color: #eaf1ff;
+      padding: 8px;
+    }
+    
+    /* 针对不同浏览器的兼容性修复 */
+    [data-theme="dark"] select option:checked {
+      background: #121a33;
+      color: #eaf1ff;
+    }
+    
+    [data-theme="dark"] select option:hover {
+      background: #1a2744;
+      color: #eaf1ff;
+    }
     
     /* 货币符号特殊处理 */
     .currency-symbol {
@@ -139,6 +165,17 @@
       background:transparent;
       width:auto;
       min-width:80px;
+    }
+    
+    /* 货币选择器内select的特殊处理 */
+    .currency-selector select option {
+      background: #fff;
+      color: #333;
+    }
+    
+    [data-theme="dark"] .currency-selector select option {
+      background: #0e152b;
+      color: #eaf1ff;
     }
     
     button{cursor:pointer;border:2px solid var(--border-light);background:#fff;color:var(--text);padding:10px 14px;border-radius:10px;transition:.2s all;font-size:14px;min-height:44px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;font-family:var(--font-family);white-space:nowrap;flex-shrink:0}
@@ -473,7 +510,7 @@ class PriceCalculator {
       sizeInput: isCustom ? c0.querySelector('input[type="number"]') : null,
       size: item.size,
       price: priceWrap.querySelector('input'),
-      count: countWrap.querySelector('input'),
+      count:countWrap.querySelector('input'),
       perBottle, perMl, perL
     };
     
@@ -980,6 +1017,3 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 </body>
 </html>
-
-
-
