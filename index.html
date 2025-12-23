@@ -367,6 +367,119 @@
 <body data-theme="light">
   <div class="wrap">
     <h1>东方树叶三得利价格计算器</h1>
+    <div class="rmb-box">
+    <div class="rmb-title">💰 人民币大写转换</div>
+    <div class="rmb-row">
+        <input type="number" id="rmbNumInput" placeholder="输入数字金额" step="any">
+        <button class="rmb-btn rmb-clear" onclick="clearRmbField()">清空</button>
+        <button class="rmb-btn rmb-copy" onclick="copyRmbResult()">复制</button>
+    </div>
+    <div class="rmb-output" id="rmbChineseResult">等待输入...</div>
+</div>
+
+<style>
+    .rmb-box {
+        max-width: 400px;
+        padding: 16px;
+        background: #ffffff;
+        border: 1px solid #eee;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        font-family: sans-serif;
+    }
+    .rmb-title {
+        font-size: 14px;
+        font-weight: bold;
+        color: #007bff;
+        margin-bottom: 12px;
+    }
+    .rmb-row {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+    }
+    #rmbNumInput {
+        width: 140px; /* 限制输入框宽度 */
+        padding: 8px 12px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        outline: none;
+        transition: border-color 0.3s;
+    }
+    #rmbNumInput:focus {
+        border-color: #007bff;
+    }
+    .rmb-btn {
+        padding: 8px 14px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 500;
+        transition: opacity 0.2s;
+    }
+    .rmb-btn:active { opacity: 0.7; }
+    .rmb-clear {
+        background: #fff;
+        color: #ff4d4f;
+        border: 1px solid #ff4d4f;
+    }
+    .rmb-copy {
+        background: #007bff;
+        color: white;
+    }
+    .rmb-output {
+        margin-top: 12px;
+        padding: 10px;
+        background: #f6ffed;
+        border-left: 4px solid #52c41a;
+        color: #389e0d;
+        font-size: 14px;
+        font-weight: bold;
+        min-height: 40px;
+        word-break: break-all;
+        display: flex;
+        align-items: center;
+    }
+</style>
+
+<script>
+    function digitToChinese(n) {
+        if (!/^(0|[1-9]\d*)(\.\d+)?$/.test(n)) return "金额格式错误";
+        let unit = "仟佰拾亿仟佰拾万仟佰拾元角分", str = "";
+        n += "00";
+        let p = n.indexOf('.');
+        if (p >= 0) n = n.substring(0, p) + n.substr(p + 1, 2);
+        unit = unit.substr(unit.length - n.length);
+        for (let i = 0; i < n.length; i++) {
+            str += '零壹贰叁肆伍陆柒捌玖'.charAt(n.charAt(i)) + unit.charAt(i);
+        }
+        return str.replace(/零(仟|佰|拾|角)/g, "零").replace(/(零)+/g, "零").replace(/零(万|亿|元)/g, "$1").replace(/(亿)万/g, "$1").replace(/^元零?|零分/g, "").replace(/元$/g, "元整");
+    }
+
+    const inputEl = document.getElementById('rmbNumInput');
+    const resultEl = document.getElementById('rmbChineseResult');
+
+    inputEl.addEventListener('input', (e) => {
+        const val = e.target.value;
+        resultEl.innerText = val ? digitToChinese(val) : "等待输入...";
+    });
+
+    function clearRmbField() {
+        inputEl.value = "";
+        resultEl.innerText = "等待输入...";
+        inputEl.focus();
+    }
+
+    function copyRmbResult() {
+        const text = resultEl.innerText;
+        if (text && text !== "等待输入..." && !text.includes('错误')) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('大写金额已复制');
+            });
+        }
+    }
+</script>
     <div class="sub">输入总价与瓶数，自动计算单价并标记最划算容量。建议每升<strong>≤5.5元</strong>可冲。</div>
 
     <div class="controls">
@@ -1017,3 +1130,4 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 </body>
 </html>
+
