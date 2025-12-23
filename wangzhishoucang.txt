@@ -1,0 +1,113 @@
+<div class="site-box">
+    <div class="site-header">
+        <div class="site-title">🔗 常用网址收藏</div>
+        <div class="site-tag">快捷跳转</div>
+    </div>
+    <div class="site-grid" id="siteGrid">
+        </div>
+</div>
+
+<style>
+    /* 模块基础样式 */
+    .site-box {
+        max-width: 400px; /* 保持与人民币模块一致的宽度 */
+        padding: 16px;
+        background: var(--card, #ffffff);
+        border: 1px solid var(--border-light, #eee);
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        margin-top: 15px;
+        font-family: sans-serif;
+    }
+
+    /* 标题区域 */
+    .site-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+    .site-title {
+        font-size: 14px;
+        font-weight: bold;
+        color: var(--accent, #007bff);
+    }
+    .site-tag {
+        font-size: 10px;
+        background: rgba(0,123,255,0.1);
+        color: var(--accent, #007bff);
+        padding: 2px 6px;
+        border-radius: 4px;
+    }
+
+    /* 栅格布局：一行3个 */
+    .site-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+    }
+
+    /* 单个入口样式 */
+    .site-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 12px 6px;
+        background: rgba(0,0,0,0.02);
+        border: 1px solid transparent;
+        border-radius: 10px;
+        text-decoration: none;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    /* 适配暗黑模式 */
+    [data-theme="dark"] .site-item {
+        background: rgba(255,255,255,0.05);
+    }
+
+    .site-item:hover {
+        border-color: var(--accent, #007bff);
+        background: rgba(0,123,255,0.08);
+        transform: translateY(-3px);
+    }
+
+    .site-icon {
+        font-size: 22px;
+        margin-bottom: 6px;
+    }
+
+    .site-name {
+        font-size: 12px;
+        color: var(--text, #333);
+        font-weight: 500;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+    }
+</style>
+
+<script>
+    (function() {
+        // 【在此处修改您的网址配置】
+        const myLinks = [
+            { name: '百度', url: 'https://www.baidu.com', icon: '🔍' },
+            { name: '淘宝', url: 'https://www.taobao.com', icon: '🛍️' },
+            { name: '京东', url: 'https://www.jd.com', icon: '📦' },
+            { name: '知乎', url: 'https://www.zhihu.com', icon: '📝' },
+            { name: 'B站', url: 'https://www.bilibili.com', icon: '📺' },
+            { name: 'Github', url: 'https://github.com', icon: '💻' }
+        ];
+
+        const grid = document.getElementById('siteGrid');
+        if (grid) {
+            grid.innerHTML = myLinks.map(link => `
+                <a href="${link.url}" target="_blank" class="site-item">
+                    <span class="site-icon">${link.icon}</span>
+                    <span class="site-name">${link.name}</span>
+                </a>
+            `).join('');
+        }
+    })();
+</script>
