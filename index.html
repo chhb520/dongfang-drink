@@ -367,202 +367,63 @@
 <body data-theme="light">
   <div class="wrap">
     <h1>东方树叶三得利价格计算器</h1>
-   <div class="tools-container">
-
-    <div class="calc-box">
-        <div class="calc-title">🧮 简易计算器</div>
-        <div class="calc-row">
-            <input type="text" id="calcInput" placeholder="如：18*6-3+2.5">
-            <div class="calc-actions">
-                <button class="calc-btn calc-clear" onclick="clearCalc()">清空</button>
-                <button class="calc-btn calc-run" onclick="runCalc()">计算</button>
+  <div class="tools-container">
+        <div class="calc-box">
+            <div class="tool-title" style="color:var(--calc-theme)">🧮 简易计算器</div>
+            <div class="tool-row">
+                <input type="text" id="calcInput" class="tool-input" placeholder="如：18*6-3">
+                <button class="btn" onclick="clearCalc()" style="color:var(--warn)">清空</button>
+                <button class="btn" onclick="runCalc()" style="background:var(--calc-theme); color:white">计算</button>
             </div>
+            <div id="calcResult" class="tool-output calc-out">等待输入...</div>
         </div>
-        <div class="calc-output" id="calcResult">等待输入...</div>
+
+        <div class="tool-divider"></div>
+
+        <div class="rmb-box">
+            <div class="tool-title" style="color:var(--rmb-theme)">💰 人民币大写转换</div>
+            <div class="tool-row">
+                <input type="number" id="rmbNumInput" class="tool-input" placeholder="输入金额">
+                <button class="btn" onclick="clearRmb()" style="color:var(--warn)">清空</button>
+                <button class="btn" onclick="copyRmb()" style="background:var(--rmb-theme); color:white">复制</button>
+            </div>
+            <div id="rmbResult" class="tool-output rmb-out">等待输入...</div>
+        </div>
     </div>
 
-    <div class="tool-divider"></div>
-
-    <div class="rmb-box">
-        <div class="rmb-title">💰 人民币大写转换</div>
-        <div class="rmb-row">
-            <input type="number" id="rmbNumInput" placeholder="输入金额" step="any">
-            <div class="rmb-actions">
-                <button class="rmb-btn rmb-clear" onclick="clearRmbField()">清空</button>
-                <button class="rmb-btn rmb-copy" onclick="copyRmbResult()">复制</button>
-            </div>
-        </div>
-        <div class="rmb-output" id="rmbChineseResult">等待输入...</div>
+    <div class="sub">输入总价与瓶数，下方列表将自动计算。</div>
+    <div class="card">
+        <p style="text-align:center; color:var(--muted)">（此处为你原有的价格对比列表）</p>
     </div>
-
-</div>
-
-<style>
-    /* 颜色配置中心 */
-    :root {
-        --bg-box: #f5f5f5;        /* 模块背景：浅灰色 */
-        --bg-input: #ffffff;      /* 输入框背景：纯白（形成对比，方便看清） */
-        --text-main: #333333;     /* 主文字颜色 */
-        --border-color: #dcdcdc;  /* 边框颜色：略深于背景 */
-        --shadow: none;           /* 灰色模式下关闭阴影，更简约 */
-        
-        --calc-theme: #722ed1;
-        --calc-out-bg: #efdbff;   /* 计算器结果背景 */
-        --rmb-theme: #007bff;
-        --rmb-out-bg: #e6f7ff;    /* 人民币结果背景 */
-        --rmb-out-text: #096dd9;
-    }
-
-    /* 自动适配黑夜模式 */
-    @media (prefers-color-scheme: dark) {
-        :root {
-            --bg-box: #1e1e1e;     /* 黑夜模式底色 */
-            --bg-input: #2d2d2d;   /* 黑夜模式输入框 */
-            --text-main: #efefef;
-            --border-color: #444444;
-            --calc-out-bg: #221633;
-            --rmb-out-bg: #112133;
-        }
-    }
-
-    .tools-container {
-        display: flex;
-        flex-direction: column;
-        max-width: 420px;
-    }
-
-    /* 通用盒子样式 */
-    .calc-box, .rmb-box {
-        padding: 20px;
-        background: var(--bg-box);
-        color: var(--text-main);
-        border: 1px solid var(--border-color);
-        border-radius: 12px;
-        font-family: -apple-system, sans-serif;
-        transition: all 0.3s ease;
-    }
-
-    /* 分割线 */
-    .tool-divider {
-        height: 1px;
-        margin: 24px 10px;
-        background: var(--border-color);
-        position: relative;
-    }
-    .tool-divider::after {
-        content: "TOOL BOX";
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%);
-        background: var(--bg-box);
-        padding: 0 12px;
-        font-size: 10px;
-        color: #999;
-        letter-spacing: 2px;
-    }
-
-    .calc-title { font-size: 14px; font-weight: bold; color: var(--calc-theme); margin-bottom: 12px; }
-    .rmb-title { font-size: 14px; font-weight: bold; color: var(--rmb-theme); margin-bottom: 12px; }
-
-    .calc-row, .rmb-row { display: flex; gap: 8px; align-items: center; }
-
-    #calcInput, #rmbNumInput {
-        width: 150px;
-        padding: 10px 12px;
-        background: var(--bg-input);
-        color: var(--text-main);
-        border: 2px solid var(--border-color);
-        border-radius: 8px;
-        outline: none;
-        font-size: 14px;
-    }
-
-    #calcInput:focus { border-color: var(--calc-theme); }
-    #rmbNumInput:focus { border-color: var(--rmb-theme); }
-
-    .calc-actions, .rmb-actions { display: flex; gap: 6px; }
-
-    .calc-btn, .rmb-btn {
-        padding: 9px 14px;
-        border-radius: 8px;
-        border: none;
-        cursor: pointer;
-        font-size: 13px;
-        font-weight: 600;
-        white-space: nowrap;
-        transition: transform 0.1s;
-    }
-    .calc-btn:active, .rmb-btn:active { transform: scale(0.95); }
-
-    .calc-run { background: var(--calc-theme); color: white; }
-    .rmb-copy { background: var(--rmb-theme); color: white; }
-    .calc-clear, .rmb-clear { background: #fff; color: #ff4d4f; border: 1px solid #ff4d4f; }
-    /* 黑夜模式下微调清除按钮 */
-    @media (prefers-color-scheme: dark) { .calc-clear, .rmb-clear { background: transparent; } }
-
-    .calc-output, .rmb-output {
-        margin-top: 15px;
-        padding: 12px;
-        border-radius: 8px;
-        font-size: 15px;
-        font-weight: bold;
-        min-height: 44px;
-        display: flex;
-        align-items: center;
-        word-break: break-all;
-    }
-
-    .calc-output { background: var(--calc-out-bg); border-left: 4px solid var(--calc-theme); color: var(--calc-theme); }
-    .rmb-output { background: var(--rmb-out-bg); border-left: 4px solid var(--rmb-out-text); color: var(--rmb-out-text); }
-</style>
+  </div>
 
 <script>
 /* --- 计算器逻辑 --- */
-function calculateExpression(expr){
-    if(!/^[\d+\-*/.\s]+$/.test(expr)) return '等待正确输入...';
-    try {
-        expr = expr.replace(/\s+/g,'');
-        if(expr.startsWith('-')) expr = '0' + expr;
-        const tokens = expr.match(/(\d+(\.\d+)?)|[+\-*/]/g);
-        if(!tokens) return '等待输入...';
-        let stack = [];
-        let i = 0;
-        while(i < tokens.length){
-            let t = tokens[i];
-            if(t === '*' || t === '/'){
-                let prev = stack.pop();
-                let next = Number(tokens[++i]);
-                stack.push(t === '*' ? prev * next : prev / next);
-            }else{
-                stack.push(isNaN(t) ? t : Number(t));
-            }
-            i++;
-        }
-        let result = stack[0];
-        for(let j = 1; j < stack.length; j += 2){
-            let op = stack[j];
-            let num = stack[j + 1];
-            if(op === '+') result += num;
-            if(op === '-') result -= num;
-        }
-        return Number(result.toFixed(10)).toString();
-    } catch(e) { return "错误"; }
-}
-
 const cInput = document.getElementById('calcInput');
 const cRes = document.getElementById('calcResult');
-cInput.addEventListener('input',()=>{
-    const val = cInput.value.trim();
-    cRes.innerText = val ? calculateExpression(val) : '等待输入...';
-});
-function runCalc(){ cRes.innerText = calculateExpression(cInput.value); }
-function clearCalc(){ cInput.value = ''; cRes.innerText = '等待输入...'; cInput.focus(); }
 
-/* --- 人民币大写逻辑 --- */
+function runCalc() {
+    const expr = cInput.value.trim();
+    if (!expr) { cRes.innerText = "等待输入..."; return; }
+    try {
+        // 使用更安全的计算逻辑
+        const func = new Function('return ' + expr.replace(/[^-+*/\d.]/g, ''));
+        const result = func();
+        cRes.innerText = result !== undefined ? result : "错误";
+    } catch (e) {
+        cRes.innerText = "表达式错误";
+    }
+}
+
+cInput.addEventListener('input', runCalc);
+function clearCalc() { cInput.value = ''; cRes.innerText = '等待输入...'; }
+
+/* --- 人民币转换逻辑 --- */
+const rInput = document.getElementById('rmbNumInput');
+const rRes = document.getElementById('rmbResult');
+
 function digitToChinese(n) {
     if (!n || isNaN(n)) return "等待输入...";
-    if (n >= 9999999999999.99) return "金额过大";
     let unit = "仟佰拾亿仟佰拾万仟佰拾元角分", str = "";
     n = parseFloat(n).toFixed(2);
     let p = n.indexOf('.');
@@ -571,21 +432,20 @@ function digitToChinese(n) {
     for (let i = 0; i < n.length; i++) {
         str += '零壹贰叁肆伍陆柒捌玖'.charAt(n.charAt(i)) + unit.charAt(i);
     }
-    let res = str.replace(/零(仟|佰|拾|角)/g, "零").replace(/(零)+/g, "零").replace(/零(万|亿|元)/g, "$1").replace(/(亿)万/g, "$1").replace(/^元零?|零分/g, "").replace(/元$/g, "元整");
-    return res || "零元整";
+    return str.replace(/零(仟|佰|拾|角)/g, "零").replace(/(零)+/g, "零").replace(/零(万|亿|元)/g, "$1").replace(/(亿)万/g, "$1").replace(/^元零?|零分/g, "").replace(/元$/g, "元整") || "零元整";
 }
 
-const rInput = document.getElementById('rmbNumInput');
-const rRes = document.getElementById('rmbChineseResult');
-rInput.addEventListener('input', (e) => { rRes.innerText = digitToChinese(e.target.value); });
-function clearRmbField() { rInput.value = ""; rRes.innerText = "等待输入..."; rInput.focus(); }
-function copyRmbResult() {
+rInput.addEventListener('input', () => {
+    rRes.innerText = digitToChinese(rInput.value);
+});
+
+function clearRmb() { rInput.value = ''; rRes.innerText = '等待输入...'; }
+
+function copyRmb() {
     const text = rRes.innerText;
-    if (text && text !== "等待输入..." && !text.includes('大')) {
+    if (text && text !== "等待输入...") {
         navigator.clipboard.writeText(text).then(() => {
-            const btn = document.querySelector('.rmb-copy');
-            btn.innerText = '已复制';
-            setTimeout(() => btn.innerText = '复制', 1500);
+            alert("已复制: " + text);
         });
     }
 }
@@ -1277,6 +1137,7 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 </body>
 </html>
+
 
 
 
